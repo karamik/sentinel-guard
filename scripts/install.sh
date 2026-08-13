@@ -60,6 +60,8 @@ WorkingDirectory=/opt/sentinel-guard
 ExecStart=/usr/bin/python3 -m agent.core
 Restart=always
 RestartSec=5
+StandardOutput=journal
+StandardError=journal
 User=root
 
 [Install]
@@ -79,6 +81,8 @@ WorkingDirectory=/opt/sentinel-guard
 ExecStart=/usr/bin/python3 -m agent.deadman
 Restart=always
 RestartSec=5
+StandardOutput=journal
+StandardError=journal
 User=root
 
 [Install]
