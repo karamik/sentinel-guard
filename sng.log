@@ -1,0 +1,8 @@
+[2026-08-09 17:00:11.708457] SNG v2.1 Deep Defense initializing on sentinel-node-01
+[Immunity] prctl skip: dlopen failed: library "libc.so.6" not found
+[Immunity] Termination signals intercepted.
+[2026-08-09 17:00:11.711808] Master PID 32478 armed.
+[INFO] SNG_V2_MASTER: Dual-Daemon + Deadman armed.
+[2026-08-09 17:00:11.711986] Sentinel PID 32480 watching Master
+[2026-08-09 17:00:11.714709] Deadman Switch launched.
+[2026-08-09 17:00:11.720424] Honeypot watching 2 files (poll 0.5s)

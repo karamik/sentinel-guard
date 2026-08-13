@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+sng_error.log
+sng_live.log
+sng_out.txt
+run_test.sh
