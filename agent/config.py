@@ -50,3 +50,6 @@ CIRCUIT_BREAKER_ACTIONS = {
 USE_LOCAL_LLM = False
 LLM_MODEL = "llama3.1:8b"
 HONEYPOT_WHITELIST = os.getenv("SNG_HONEYPOT_WHITELIST", "rsync,tar,backup,cp,mv").split(",")
+
+# Product type: node | api | infra | bot | tunnel
+SNG_PRODUCT = os.getenv("SNG_PRODUCT", "node")
