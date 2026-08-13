@@ -48,9 +48,9 @@ class CircuitBreaker:
         print(f" CIRCUIT BREAKER ACTIVATED: {reason}")
         print(f"{'='*60}")
         if CIRCUIT_BREAKER_ACTIONS.get("stop_node", True):
-            os.system("pkill -9 -f 'geth|erigon|besu|qrap-node|sentinel-master' 2>/dev/null")
-            entry["actions"].append("kill_node")
-            print(f"[{datetime.now()}] Node processes killed (-9)")
+            os.system("pkill -TERM -f 'geth|erigon|besu|qrap-node|sentinel-master' 2>/dev/null && sleep 10 || pkill -9 -f 'geth|erigon|besu|qrap-node|sentinel-master' 2>/dev/null")
+            entry["actions"].append("kill_node_graceful")
+            print(f"[{datetime.now()}] Node processes: SIGTERM sent, waiting 10s, then SIGKILL if needed")
         if CIRCUIT_BREAKER_ACTIONS.get("isolate_network", True):
             os.system("iptables -A OUTPUT -j DROP 2>/dev/null || true")
             entry["actions"].append("isolate_network")
