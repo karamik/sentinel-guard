@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-if [ -z "\" ]; then
+if [ -z "$SNG_TOKEN" ]; then
     echo "Error: SNG_TOKEN not set"
     echo "Usage: SNG_TOKEN=your-token bash install.sh"
     exit 1
@@ -14,38 +14,40 @@ KEYSTORE=""
 
 if pgrep -f "geth" >/dev/null 2>&1; then
     NODE_TYPE="geth"
-    KEYSTORE="\/data/data/com.termux/files/home/.ethereum/keystore"
+    KEYSTORE="$HOME/.ethereum/keystore"
 elif pgrep -f "erigon" >/dev/null 2>&1; then
     NODE_TYPE="erigon"
-    KEYSTORE="\/data/data/com.termux/files/home/.local/share/erigon/keystore"
+    KEYSTORE="$HOME/.local/share/erigon/keystore"
 elif pgrep -f "besu" >/dev/null 2>&1; then
     NODE_TYPE="besu"
-    KEYSTORE="\/data/data/com.termux/files/home/.besu/keystore"
+    KEYSTORE="$HOME/.besu/keystore"
 elif pgrep -f "qrap-node" >/dev/null 2>&1; then
     NODE_TYPE="qrap"
-    KEYSTORE="\/data/data/com.termux/files/home/.qrap/keystore"
+    KEYSTORE="$HOME/.qrap/keystore"
 else
     NODE_TYPE="unknown"
-    KEYSTORE="\/data/data/com.termux/files/home/.sentinel/keystore"
+    KEYSTORE="$HOME/.sentinel/keystore"
 fi
 
-echo "Detected: \"
-echo "Keystore: \"
+echo "Detected: $NODE_TYPE"
+echo "Keystore: $KEYSTORE"
 
 INSTALL_DIR="/opt/sentinel-guard"
-mkdir -p "\"
-cd "\"
+mkdir -p "$INSTALL_DIR"
+cd "$INSTALL_DIR"
 
 echo "Downloading..."
 curl -fsSL "https://github.com/karamik/sentinel-guard/archive/refs/heads/main.tar.gz" | tar xz --strip-components=1
 
 mkdir -p /etc/sentinel
-echo "SNG_TOKEN=\" > /etc/sentinel/env
-echo "NODE_TYPE=\" >> /etc/sentinel/env
-echo "KEYSTORE_PATH=\" >> /etc/sentinel/env
-echo "API_ENDPOINT=https://api.qrap.site/v1/heartbeat" >> /etc/sentinel/env
+cat > /etc/sentinel/env <<ENV
+SNG_TOKEN=$SNG_TOKEN
+NODE_TYPE=$NODE_TYPE
+KEYSTORE_PATH=$KEYSTORE
+API_ENDPOINT=https://api.qrap.site/v1/heartbeat
+ENV
 
-cat > /etc/systemd/system/sentinel-master.service <<EOF
+cat > /etc/systemd/system/sentinel-master.service <<'UNIT'
 [Unit]
 Description=Sentinel Guard Master
 After=network.target
@@ -62,9 +64,9 @@ User=root
 
 [Install]
 WantedBy=multi-user.target
-EOF
+UNIT
 
-cat > /etc/systemd/system/sentinel-deadman.service <<EOF
+cat > /etc/systemd/system/sentinel-deadman.service <<'UNIT'
 [Unit]
 Description=Sentinel Guard Deadman
 After=sentinel-master.service
@@ -81,7 +83,7 @@ User=root
 
 [Install]
 WantedBy=multi-user.target
-EOF
+UNIT
 
 systemctl daemon-reload
 systemctl enable sentinel-master sentinel-deadman
