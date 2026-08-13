@@ -11,12 +11,31 @@ class CircuitBreaker:
         LOG_DIR.mkdir(parents=True, exist_ok=True)
         self.log_file = LOG_DIR / "circuit_breaker.log"
 
-    def trigger(self, reason):
+    def trigger(self, reason, severity="HIGH"):
         if self.triggered:
             return
         self.triggered = True
         from agent.config import SNG_DRY_RUN
+        import time
+        abort_file = "/tmp/sentinel_abort"
+        if os.path.exists(abort_file):
+            os.remove(abort_file)
+        print(f"[{datetime.now()}] LOCKDOWN in 5 seconds. Create /tmp/sentinel_abort to abort.")
+        self.alert.send("CRITICAL", "LOCKDOWN_PENDING", f"{reason}. Abort with: touch /tmp/sentinel_abort")
+        for i in range(5, 0, -1):
+            time.sleep(1)
+            if os.path.exists(abort_file):
+                os.remove(abort_file)
+                print(f"[{datetime.now()}] LOCKDOWN ABORTED by user.")
+                self.alert.send("INFO", "LOCKDOWN_ABORTED", "User aborted lockdown via /tmp/sentinel_abort")
+                return
         if SNG_DRY_RUN:
+        from agent.config import SEVERITY_LEVELS
+        level = SEVERITY_LEVELS.get(severity, SEVERITY_LEVELS["HIGH"])
+        if not level.get("circuit_breaker", True):
+            print(f"[{datetime.now()}] MEDIUM threat: {reason}. Alert sent. Node NOT killed (circuit_breaker disabled for this level).")
+            self.alert.send("HIGH", f"THREAT_{severity}", f"{reason}. Circuit Breaker suppressed by severity level.")
+            return
             print(f"[{datetime.now()}] DRY RUN: Circuit Breaker WOULD trigger for: {reason}")
             self.alert.send("CRITICAL", "DRY_RUN_CIRCUIT_BREAKER", f"Would trigger: {reason}. Set SNG_DRY_RUN=false to enable.")
             return

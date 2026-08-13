@@ -24,6 +24,12 @@ KEYSTORE_PATH = os.getenv("KEYSTORE_PATH", str(Path.home() / ".sentinel" / "keys
 HONEYPOT_DIR = Path(KEYSTORE_PATH)
 DB_PATH = LOG_DIR / "sentinel_threats.db"
 
+SEVERITY_LEVELS = {
+    "LOW": {"alert": True, "circuit_breaker": False, "telegram": True},
+    "MEDIUM": {"alert": True, "circuit_breaker": False, "telegram": True, "pause": True},
+    "HIGH": {"alert": True, "circuit_breaker": True, "telegram": True}
+}
+
 ALERT_THRESHOLDS = {
     "balance_drop_percent": 5.0,
     "suspicious_tx_value_eth": 100.0,
@@ -43,3 +49,4 @@ CIRCUIT_BREAKER_ACTIONS = {
 
 USE_LOCAL_LLM = False
 LLM_MODEL = "llama3.1:8b"
+HONEYPOT_WHITELIST = os.getenv("SNG_HONEYPOT_WHITELIST", "rsync,tar,backup,cp,mv").split(",")

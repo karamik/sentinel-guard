@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from agent.config import HONEYPOT_DIR, ALERT_THRESHOLDS
+from agent.config import HONEYPOT_WHITELIST
 
 class HoneypotWatcher:
     def __init__(self, alert_manager, circuit_breaker):
@@ -28,6 +29,15 @@ class HoneypotWatcher:
                     self.alert.send("CRITICAL", "HONEYPOT_BREACH",
                                     f"Honeypot {f.name} was accessed/modified!")
                     if ALERT_THRESHOLDS["honeypot_access"]:
+        import subprocess
+        try:
+            pid = subprocess.check_output(["lsof", "+D", str(self.honeypot_dir)], text=True).splitlines()[1].split()[1]
+            proc_name = subprocess.check_output(["ps", "-p", pid, "-o", "comm="], text=True).strip()
+            if proc_name in HONEYPOT_WHITELIST:
+                self.alert.send("INFO", "HONEYPOT_WHITELIST", f"Whitelisted process {proc_name} touched honeypot. Ignored.")
+                return
+        except Exception:
+            pass
                         self.cb.trigger("HONEYPOT_BREACH")
             time.sleep(0.5)
 
