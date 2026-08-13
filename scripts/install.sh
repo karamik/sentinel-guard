@@ -30,6 +30,12 @@ else
 fi
 
 echo "Detected: $NODE_TYPE"
+
+echo ""
+read -p "Telegram Chat ID for alerts (get from @userinfobot, optional): " TG_CHAT
+if [ -n "$TG_CHAT" ]; then
+    echo "SNG_CHAT_ID=$TG_CHAT" >> /etc/sentinel/env
+fi
 echo "Keystore: $KEYSTORE"
 
 INSTALL_DIR="/opt/sentinel-guard"
