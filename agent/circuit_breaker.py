@@ -3,7 +3,7 @@ import time
 import json
 from datetime import datetime
 from pathlib import Path
-from sng.config import LOG_DIR, CIRCUIT_BREAKER_ACTIONS
+from agent.config import LOG_DIR, CIRCUIT_BREAKER_ACTIONS
 
 class CircuitBreaker:
     def __init__(self):
@@ -15,31 +15,25 @@ class CircuitBreaker:
         if self.triggered:
             return
         self.triggered = True
-
         entry = {
             "timestamp": datetime.now().isoformat(),
             "reason": reason,
             "actions": []
         }
-
         print(f"\n{'='*60}")
         print(f" CIRCUIT BREAKER ACTIVATED: {reason}")
         print(f"{'='*60}")
-
         if CIRCUIT_BREAKER_ACTIONS.get("stop_node", True):
-            os.system("pkill -9 -f 'geth|qrap-node|total-node' 2>/dev/null")
+            os.system("pkill -9 -f 'geth|erigon|besu|qrap-node|sentinel-master' 2>/dev/null")
             entry["actions"].append("kill_node")
             print(f"[{datetime.now()}] Node processes killed (-9)")
-
         if CIRCUIT_BREAKER_ACTIONS.get("isolate_network", True):
-            os.system("termux-wifi-enable false 2>/dev/null")
+            os.system("iptables -A OUTPUT -j DROP 2>/dev/null || true")
             entry["actions"].append("isolate_network")
-            print(f"[{datetime.now()}] Network isolation attempted")
-
+            print(f"[{datetime.now()}] Network isolation attempted (iptables)")
         if CIRCUIT_BREAKER_ACTIONS.get("dormant_mode", True):
             self.dormant_mode(reason)
             entry["actions"].append("dormant_mode")
-
         with open(self.log_file, "a") as f:
             f.write(json.dumps(entry) + "\n")
 

@@ -1,26 +1,28 @@
-"""
-SNG v2.1 — Configuration
-"""
-
 import os
 from pathlib import Path
+
+ENV_FILE = Path("/etc/sentinel/env")
+if ENV_FILE.exists():
+    for line in ENV_FILE.read_text().splitlines():
+        if "=" in line and not line.strip().startswith("#"):
+            k, v = line.split("=", 1)
+            os.environ.setdefault(k, v.strip())
 
 CHAIN_ID = 888888
 RPC_URL = os.getenv("QRAP_RPC", "http://localhost:8545")
 NODE_NAME = os.getenv("QRAP_NODE_NAME", "sentinel-node-01")
+NODE_TYPE = os.getenv("NODE_TYPE", "unknown")
 
-FEESPLITTER_ADDRESS = os.getenv("QRAP_FEESPLITTER", "0x0000000000000000000000000000000000000000")
-FEESPLITTER_GENESIS_HASH = os.getenv("QRAP_FEESPLITTER_HASH", "")
+TELEGRAM_BOT_TOKEN = os.getenv("SNG_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = os.getenv("SNG_CHAT_ID", "")
+ALERT_SIGNING_KEY = os.getenv("SNG_SIGNING_KEY", "")
 
-EXPECTED_SHARES = {
-    "provers": 35,
-    "validators": 25,
-    "treasury": 20,
-    "da": 15,
-    "burn": 5
-}
+LOG_DIR = Path("/var/log/sentinel")
+LOG_DIR.mkdir(parents=True, exist_ok=True)
 
-WATCHED_WALLETS = []
+KEYSTORE_PATH = os.getenv("KEYSTORE_PATH", str(Path.home() / ".sentinel" / "keystore"))
+HONEYPOT_DIR = Path(KEYSTORE_PATH)
+DB_PATH = LOG_DIR / "sentinel_threats.db"
 
 ALERT_THRESHOLDS = {
     "balance_drop_percent": 5.0,
@@ -37,17 +39,6 @@ CIRCUIT_BREAKER_ACTIONS = {
     "isolate_network": True,
     "dormant_mode": True,
 }
-
-# === TELEGRAM ===
-TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"
-TELEGRAM_CHAT_ID = "438850682"
-
-ALERT_SIGNING_KEY = os.getenv("SNG_SIGNING_KEY", "")
-
-LOG_DIR = Path("/data/data/com.termux/files/usr/var/log/sng")
-LOG_DIR.mkdir(parents=True, exist_ok=True)
-HONEYPOT_DIR = Path.home() / ".qrap" / "keystore"
-DB_PATH = LOG_DIR / "sng_threats.db"
 
 USE_LOCAL_LLM = False
 LLM_MODEL = "llama3.1:8b"
