@@ -33,6 +33,7 @@ ALERT_THRESHOLDS = {
     "contract_balance_drop": True,
 }
 
+SNG_DRY_RUN = os.getenv("SNG_DRY_RUN", "true").lower() == "true"
 CIRCUIT_BREAKER_ACTIONS = {
     "stop_node": True,
     "revoke_keys": False,

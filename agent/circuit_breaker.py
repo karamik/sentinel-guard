@@ -15,6 +15,11 @@ class CircuitBreaker:
         if self.triggered:
             return
         self.triggered = True
+        from agent.config import SNG_DRY_RUN
+        if SNG_DRY_RUN:
+            print(f"[{datetime.now()}] DRY RUN: Circuit Breaker WOULD trigger for: {reason}")
+            self.alert.send("CRITICAL", "DRY_RUN_CIRCUIT_BREAKER", f"Would trigger: {reason}. Set SNG_DRY_RUN=false to enable.")
+            return
         entry = {
             "timestamp": datetime.now().isoformat(),
             "reason": reason,

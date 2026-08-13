@@ -51,6 +51,7 @@ SNG_TOKEN=$SNG_TOKEN
 NODE_TYPE=$NODE_TYPE
 KEYSTORE_PATH=$KEYSTORE
 API_ENDPOINT=https://api.qrap.site/v1/heartbeat
+SNG_DRY_RUN=true
 ENV
 
 cat > /etc/systemd/system/sentinel-master.service <<'UNIT'
