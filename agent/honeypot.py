@@ -2,7 +2,7 @@ import os
 import time
 from datetime import datetime
 from pathlib import Path
-from sng.config import HONEYPOT_DIR, ALERT_THRESHOLDS
+from agent.config import HONEYPOT_DIR, ALERT_THRESHOLDS
 
 class HoneypotWatcher:
     def __init__(self, alert_manager, circuit_breaker):
